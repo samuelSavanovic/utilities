@@ -24,6 +24,7 @@ init_string(struct string *s) {
 size_t
 writefunc(void *ptr, size_t size, size_t nmemb, struct string *s)
 {
+	
   size_t new_len = s->len + size*nmemb;
   s->ptr = realloc(s->ptr, new_len+1);
   if (s->ptr == NULL) {
@@ -87,10 +88,9 @@ downloadImg(CURL *curl, char* url, char* filename) {
 }
 
 int
-main(int argc, char *argv[])
-{
+main(int argc, char *argv[]) {
   if (argc < 3) {
-    fprintf(stderr, "usage: progName category resolution\nAvailable categories:\n\tbuildings food nature people technology objects\n\tResolution: WxH e.g 1600x900\n");
+    fprintf(stderr, "usage: progName category resolution\nAvailable categories:\n\tbuildings food nature people technology objects\nResolution:\n\tWxH e.g 1600x900\n");
     exit(EXIT_FAILURE);
   }
   char buffer[30];
@@ -99,18 +99,13 @@ main(int argc, char *argv[])
 
   gettimeofday(&tv, NULL);
   curtime=tv.tv_sec;
-
   strftime(buffer,30,"%T.",localtime(&curtime));
-  // printf("%s\n",buffer);
   CURL *curl;
   CURLcode res;
 
   curl = curl_easy_init();
   int ind1, ind2;
-  char n[300];
-  int j = 0;
-  for (j; j < 300; j++)
-    n[j] = -1;
+  char *n;
 
   struct string s;
 
@@ -119,7 +114,7 @@ main(int argc, char *argv[])
     download(curl, &res, &s, argv[1], argv[2]);
     int i = 0;
     int fcount = 1;
-
+		n = (char *)malloc(sizeof(char) * s.len);
     for (i; i < s.len; i++) {
       n[i] = s.ptr[i];
       if (s.ptr[i] == '\"') {
@@ -136,7 +131,7 @@ main(int argc, char *argv[])
   }
 
   int i = ind1 +1;
-  j = 0;
+  int j = 0;
   char *new_url = (char*)malloc((ind2 - 2) * sizeof(char));
   for (j; j < ind2 - ind1 - 1; j++) {
     new_url[j] = n[i + j];
@@ -146,6 +141,7 @@ main(int argc, char *argv[])
   downloadImg(curl2,  new_url, concat(3,"img", buffer, "jpg"));
   free(s.ptr);
   free(new_url);
+	free(n);
   curl_easy_cleanup(curl2);
   return 0;
 }

@@ -138,10 +138,12 @@ main(int argc, char *argv[]) {
   }
 
   CURL* curl2 = curl_easy_init();
-  downloadImg(curl2,  new_url, concat(3,"img", buffer, "jpg"));
+  char * path = concat(4,getenv("HOME"),"/Pictures/img", buffer, "jpg");
+  downloadImg(curl2,  new_url, path);
+  system(concat(2,"gsettings set org.gnome.desktop.background picture-uri file://",path));
   free(s.ptr);
   free(new_url);
-	free(n);
+  free(n);
   curl_easy_cleanup(curl2);
   return 0;
 }
